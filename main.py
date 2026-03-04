@@ -20,7 +20,11 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 配置
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "1394874362.ljw")
-DATA_FILE = "/tmp/accounts.json"
+DATA_FILE = "/opt/render/project/src/accounts.json"  # Render 持久化路径
+
+# 如果持久化路径不存在，使用临时路径
+if not os.path.exists(os.path.dirname(DATA_FILE)):
+    DATA_FILE = "/tmp/accounts.json"
 
 # 数据模型
 class Account(BaseModel):
