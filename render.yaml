@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: chatgpt-proxy
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: ADMIN_PASSWORD
+        value: 1394874362.ljw
+      - key: PORT
+        value: 8080
