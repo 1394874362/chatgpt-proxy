@@ -8,11 +8,15 @@ import hashlib
 from datetime import datetime
 from typing import Dict, List, Optional
 from fastapi import FastAPI, HTTPException, Header, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import uvicorn
 
 app = FastAPI(title="ChatGPT Account Pool API")
+
+# 挂载静态文件
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # 配置
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "1394874362.ljw")
@@ -92,15 +96,19 @@ def verify_password(password: str) -> bool:
     return password == ADMIN_PASSWORD
 
 # API 路由
-@app.get("/")
-async def root():
-    """健康检查"""
-    return {
-        "status": "ok",
-        "service": "ChatGPT Account Pool API",
-        "accounts": len(pool.accounts),
-        "timestamp": datetime.now().isoformat()
-    }
+@app.get("/", response_class=HTMLResponse)
+async def dashboard():
+    """管理界面"""
+    try:
+        with open("static/index.html", "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return {
+            "status": "ok",
+            "service": "ChatGPT Account Pool API",
+            "accounts": len(pool.accounts),
+            "timestamp": datetime.now().isoformat()
+        }
 
 @app.get("/api/accounts")
 async def list_accounts(authorization: Optional[str] = Header(None)):

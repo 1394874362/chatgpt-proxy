@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Pool Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- 侧边栏 -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🚀</div>
+                    <span class="logo-text">ChatGPT Pool</span>
+                </div>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">仪表板</span>
+                </a>
+                <a href="#" class="nav-item" data-page="accounts">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">账号管理</span>
+                </a>
+                <a href="#" class="nav-item" data-page="api">
+                    <span class="nav-icon">🔗</span>
+                    <span class="nav-text">API 文档</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部栏 -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h1 class="page-title">仪表板</h1>
+                    <span class="page-subtitle">实时监控您的 ChatGPT 账号池</span>
+                </div>
+                <div class="topbar-right">
+                    <button class="btn-refresh" onclick="refreshData()">
+                        <span class="refresh-icon">🔄</span>
+                        刷新
+                    </button>
+                    <div class="status-indicator">
+                        <div class="status-dot online"></div>
+                        <span>在线</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 仪表板页面 -->
+            <div class="page-content" id="dashboard-page">
+                <!-- 统计卡片 -->
+                <div class="stats-grid">
+                    <div class="stat-card total">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="total-accounts">0</div>
+                            <div class="stat-label">总账号数</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card active">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="active-accounts">0</div>
+                            <div class="stat-label">活跃账号</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card inactive">
+                        <div class="stat-icon">⏸️</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="inactive-accounts">0</div>
+                            <div class="stat-label">暂停账号</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card expired">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="expired-accounts">0</div>
+                            <div class="stat-label">过期账号</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 快速操作 -->
+                <div class="quick-actions">
+                    <h3>快速操作</h3>
+                    <div class="action-buttons">
+                        <button class="action-btn primary" onclick="getRandomAccount()">
+                            <span class="btn-icon">🎲</span>
+                            获取随机账号
+                        </button>
+                        <button class="action-btn secondary" onclick="testConnection()">
+                            <span class="btn-icon">🔍</span>
+                            测试连接
+                        </button>
+                        <button class="action-btn secondary" onclick="exportData()">
+                            <span class="btn-icon">📥</span>
+                            导出数据
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 最近活动 -->
+                <div class="recent-activity">
+                    <h3>最近活动</h3>
+                    <div class="activity-list" id="activity-list">
+                        <!-- 活动项将在这里动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 账号管理页面 -->
+            <div class="page-content hidden" id="accounts-page">
+                <div class="accounts-header">
+                    <div class="search-bar">
+                        <input type="text" placeholder="搜索账号..." id="search-input">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all">全部</button>
+                        <button class="filter-tab" data-filter="active">活跃</button>
+                        <button class="filter-tab" data-filter="inactive">暂停</button>
+                        <button class="filter-tab" data-filter="expired">过期</button>
+                    </div>
+                </div>
+                
+                <div class="accounts-grid" id="accounts-grid">
+                    <!-- 账号卡片将在这里生成 -->
+                </div>
+            </div>
+
+            <!-- API 文档页面 -->
+            <div class="page-content hidden" id="api-page">
+                <div class="api-docs">
+                    <h3>API 接口文档</h3>
+                    
+                    <div class="api-section">
+                        <h4>获取账号统计</h4>
+                        <div class="api-endpoint">
+                            <span class="method get">GET</span>
+                            <code>/api/stats</code>
+                        </div>
+                        <p>获取账号池的统计信息，包括总数、活跃数等。</p>
+                    </div>
+                    
+                    <div class="api-section">
+                        <h4>获取随机账号</h4>
+                        <div class="api-endpoint">
+                            <span class="method get">GET</span>
+                            <code>/api/account</code>
+                        </div>
+                        <p>随机获取一个可用的账号信息。</p>
+                    </div>
+                    
+                    <div class="api-section">
+                        <h4>获取所有账号</h4>
+                        <div class="api-endpoint">
+                            <span class="method get">GET</span>
+                            <code>/api/accounts</code>
+                        </div>
+                        <p>获取所有账号列表（需要管理员权限）。</p>
+                        <div class="api-auth">
+                            <strong>认证：</strong>
+                            <code>Authorization: 1394874362.ljw</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 模态框 -->
+    <div class="modal hidden" id="account-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>账号详情</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- 账号详情内容 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
