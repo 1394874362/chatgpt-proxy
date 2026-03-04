@@ -1,0 +1,6 @@
+{
+  "cpa_url": "https://your-app-name.onrender.com",
+  "cpa_password": "your-strong-password",
+  "tokens_dir": "../data/tokens",
+  "uptimerobot_api_key": "your-uptimerobot-api-key-optional"
+}

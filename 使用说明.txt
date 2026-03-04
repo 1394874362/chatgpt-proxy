@@ -1,0 +1,164 @@
+========================================
+  CPA 反代部署 - 完整使用流程
+========================================
+
+📦 你现在有的文件：
+  ✅ Dockerfile - Docker 配置
+  ✅ render.yaml - Render 部署配置
+  ✅ upload_tokens.py - 自动上传脚本
+  ✅ keep_alive.py - 保活脚本
+  ✅ setup_uptimerobot.py - UptimeRobot 配置
+  ✅ example_usage.py - Python 使用示例
+  ✅ deploy.bat / deploy.sh - 一键部署脚本
+
+========================================
+  第 1 步：部署到 Render
+========================================
+
+方式 A：直接部署镜像（最简单）
+  1. 访问 https://render.com
+  2. 点击 "New +" → "Web Service"
+  3. 选择 "Deploy an existing image"
+  4. 填写：
+     Image URL: linweiyuan/go-chatgpt-api:latest
+     Name: chatgpt-proxy
+  5. 添加环境变量：
+     ADMIN_PASSWORD = 你的强密码
+     PORT = 8080
+  6. 点击 "Create Web Service"
+  7. 记下地址：https://chatgpt-proxy-xxxx.onrender.com
+
+方式 B：通过 GitHub（推荐）
+  1. 运行：bash init_git.sh（Linux/Mac）
+  2. 在 GitHub 创建新仓库
+  3. 输入仓库地址推送代码
+  4. 在 Render 连接 GitHub 仓库部署
+
+========================================
+  第 2 步：配置本地工具
+========================================
+
+1. 复制配置文件：
+   cp config.example.json config.json
+
+2. 编辑 config.json：
+   {
+     "cpa_url": "https://chatgpt-proxy-xxxx.onrender.com",
+     "cpa_password": "你的密码",
+     "tokens_dir": "../data/tokens"
+   }
+
+========================================
+  第 3 步：上传账号
+========================================
+
+Windows:
+  deploy.bat
+
+Linux/Mac:
+  bash deploy.sh
+
+或手动运行：
+  pip install requests
+  python upload_tokens.py
+
+========================================
+  第 4 步：配置保活（防止休眠）
+========================================
+
+推荐方式：UptimeRobot（完全免费）
+  1. 访问 https://uptimerobot.com 注册
+  2. 获取 API Key
+  3. 填写到 config.json
+  4. 运行：python setup_uptimerobot.py
+
+备选方式：Cron-job.org
+  1. 访问 https://cron-job.org 注册
+  2. 创建定时任务
+  3. URL: 你的 Render 地址
+  4. 间隔: 每 10 分钟
+
+本地方式：
+  python keep_alive.py
+
+========================================
+  第 5 步：使用 API
+========================================
+
+Python 示例：
+  python example_usage.py
+
+JavaScript 示例：
+  node example_usage.js
+
+cURL 测试：
+  curl https://你的地址/v1/chat/completions \
+    -H "Authorization: Bearer 你的密码" \
+    -H "Content-Type: application/json" \
+    -d '{"model":"gpt-4o-mini","messages":[{"role":"user","content":"你好"}]}'
+
+========================================
+  常见应用配置
+========================================
+
+ChatGPT-Next-Web:
+  OPENAI_API_BASE_URL=https://你的地址/v1
+  OPENAI_API_KEY=你的密码
+
+ChatBox:
+  设置 → API 设置
+  API Host: https://你的地址
+  API Key: 你的密码
+
+OpenAI SDK:
+  import openai
+  openai.api_base = "https://你的地址/v1"
+  openai.api_key = "你的密码"
+
+========================================
+  管理命令
+========================================
+
+查看账号列表：
+  curl https://你的地址/v0/management/auth-files \
+    -H "Authorization: Bearer 你的密码"
+
+删除账号：
+  curl -X DELETE "https://你的地址/v0/management/auth-files?name=token_xxx.json" \
+    -H "Authorization: Bearer 你的密码"
+
+查看日志：
+  Render Dashboard → 你的服务 → Logs
+
+========================================
+  故障排查
+========================================
+
+问题 1：上传失败
+  - 检查 CPA 服务是否运行
+  - 检查密码是否正确
+  - 查看 Render 日志
+
+问题 2：API 调用失败
+  - 确认账号已上传
+  - 检查请求格式
+  - 查看 Render 日志
+
+问题 3：服务休眠
+  - 配置 UptimeRobot
+  - 或使用 Cron-job.org
+  - 或运行本地保活脚本
+
+问题 4：首次访问慢
+  - Render 免费版休眠后首次唤醒需要 30-60 秒
+  - 配置保活服务可解决
+
+========================================
+  更多帮助
+========================================
+
+完整文档：README.md
+快速开始：QUICKSTART.md
+项目地址：https://github.com/linweiyuan/go-chatgpt-api
+
+========================================
